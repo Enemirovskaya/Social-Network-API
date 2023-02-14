@@ -56,39 +56,55 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
       
-    //   res.json(thought))
-    //   .catch((err) => {
-    //     console.log(err);
-    //     return res.status(500).json(err);
-    //   });
-    // },
+ // Update a thought
+ updateThought(req, res) {
+  Thought.findOneAndUpdate(
+    { _id: req.params.thoughtId },
+    { $set: req.body },
+    { runValidators: true, new: true }
+  )
+    .then((thought) =>
+      !thought
+        ? res.status(404).json({ message: 'No thought with this id!' })
+        : res.json(thought)
+    )
+    .catch((err) => res.status(500).json(err));
+},
 
     // Delete a thought
+    // delete thought
   deleteThought(req, res) {
     Thought.findOneAndDelete({ _id: req.params.thoughtId })
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: 'No thought with this ID' })
-          : User.deleteMany({ _id: { $in: thought.users } })
-      )
-      .then(() => res.json({ message: 'Thought deleted!' }))
-      .catch((err) => res.status(500).json(err));
-  },
+      .then((thought) => {
+        if (!thought) {
+          return res.status(404).json({ message: 'No thought with this id' });
+        }
 
-  // Update a thought
-  updateThought(req, res) {
-    Thought.findOneAndUpdate(
-      { _id: req.params.thoughtId },
-      { $set: req.body },
-      { runValidators: true, new: true }
-    )
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: 'No thought with this id!' })
-          : res.json(thought)
-      )
+        return User.findOneAndUpdate(
+          { _id: req.body.userId },
+          { $pull: { thoughts: req.params.thoughtId } },
+          {new: true }
+        );
+      }) 
+      .then((thought) => {
+        if (!thought) {
+          return res.json(({ message: 'Thought successfully deleted!' }));
+        }
+      })
       .catch((err) => res.status(500).json(err));
   },
+  // deleteThought(req, res) {
+  //   Thought.findOneAndDelete({ _id: req.params.thoughtId })
+  //     .then((thought) =>
+  //       !thought
+  //         ? res.status(404).json({ message: 'No thought with this ID' })
+  //         : User.deleteMany({ _id: { $in: thought.users } })
+  //     )
+  //     .then(() => res.json({ message: 'Thought deleted!' }))
+  //     .catch((err) => res.status(500).json(err));
+  // },
+
+ 
 
   //Add reaction
   createReaction(req, res){
@@ -108,13 +124,6 @@ module.exports = {
       console.log(err);
       res.status(400).json(err);
   });
-      // .then(async (thought) => {
-      //   return res.json(thought);
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      //   return res.status(500).json(err);
-      // });
   },
 
   //Remove reaction
