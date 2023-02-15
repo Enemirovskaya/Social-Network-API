@@ -9,8 +9,6 @@
  - [Installation](#installation)
  - [Usage](#usage)
  - [Tests](#tests)
- - [Questions](#questions)
- - [Sources](#sources)
 
 ## Installation
 
@@ -20,7 +18,7 @@
 
 This application could be used with a front end to create a social media application
 
-## Contributing
+## Test
 
-Please
+Please use insomnia app to test routes
 
